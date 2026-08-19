@@ -1,0 +1,9 @@
+* text eol=lf
+
+# --- EXEMPT BINARY FILES (images, media, etc.) ---
+*.png    -text
+*.jpg    -text
+*.jpeg   -text
+*.gif    -text
+*.ico    -text
+*.svg    -text
