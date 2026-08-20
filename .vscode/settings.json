@@ -2,12 +2,10 @@
     "editor.formatOnSave": true,
     "editor.wordWrap": "on",
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "always",
-        "source.fixAll": "always"
+        "source.organizeImports": "always"
     },
     "dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
     "dotnet.codeLens.enableReferencesCodeLens": true,
-    "dotnet.defaultSolution": "csharp-template.slnx",
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
