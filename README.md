@@ -27,7 +27,11 @@ dotnet run     # run the console app
 
 ## Adding a Web API project
 
-The console app in this template is a starting point — you can add other project types to the same solution. For an ASP.NET Core Web API:
+There are two ways to go about this, depending on whether you want to keep the console app or replace it.
+
+### Option A: keep the template project, add the API alongside it
+
+Adds a new project to the existing `csharp-template.slnx` without touching what's already here.
 
 ```sh
 dotnet new webapi -n MyApi                # minimal API (no controllers)
@@ -35,7 +39,22 @@ dotnet new webapi -controllers -n MyApi   # controller-based Web API
 dotnet sln add MyApi/MyApi.csproj
 ```
 
-If you're using C# Dev Kit, the same templates are available from the Command Palette via **".NET: New Project"**, which walks through picking a template, name, and location instead of using the CLI directly.
+### Option B: start from scratch
+
+Removes the template's own console app, project, and solution files first, then creates a fresh solution containing only the new API.
+
+```sh
+rm csharp-template.csproj csharp-template.slnx Program.cs
+
+dotnet new sln --name MyApi
+dotnet new webapi -n MyApi                # minimal API (no controllers)
+dotnet new webapi -controllers -n MyApi   # controller-based Web API
+dotnet sln add MyApi/MyApi.csproj
+```
+
+`dotnet sln add` looks for a single `.sln`/`.slnx` in the current directory when none is given — if you skip `dotnet new sln` after deleting `csharp-template.slnx`, it'll fail with "no solution file found."
+
+Either way, if you're using C# Dev Kit, the same templates are available from the Command Palette via **".NET: New Project"**, which walks through picking a template, name, and location instead of using the CLI directly.
 
 ## Using this as a starting point
 
