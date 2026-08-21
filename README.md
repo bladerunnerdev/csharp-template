@@ -25,6 +25,27 @@ dotnet build   # build the solution
 dotnet run     # run the console app
 ```
 
+## Debugging
+
+Press F5 (or use the Run and Debug view) with a `.cs` file open — with C# Dev Kit installed, no `launch.json` is required. It figures out the right project to build and launch dynamically. `.vscode/launch.json` in this template is deliberately left empty (`"configurations": []`); it's there as a shell to fill in only if you need a customized configuration (env vars, CLI args, auto-launching a browser, etc.), not because one is required to debug.
+
+If VS Code (or a tutorial) prompts you to run **".NET: Generate Assets for Build and Debug"** — the dialog shown when doing so with C# Dev Kit installed warns that it's *not recommended*. That command is the older, pre-Dev-Kit way of debugging: it writes a `coreclr`-based `launch.json` plus a matching `tasks.json` build task. C# Dev Kit's dynamic configurations replace both, so choosing **Yes** ("use a dynamic configuration instead") is the right call — see [No launch.json required](https://code.visualstudio.com/docs/csharp/debugging#_no-launchjson) for details. Only choose **No** if you specifically want the legacy, file-based setup for some reason.
+
+### Attaching to a process started outside VS Code
+
+If you ran `dotnet run` in a plain terminal (or anywhere else outside VS Code's own Run and Debug flow) and want to attach a debugger to it afterwards, this isn't in the Run and Debug dropdown — that only lists launch configurations, not attach. Instead:
+
+1. Open the Command Palette (Ctrl+Shift+P) and run **"Debug: Attach to a .NET 5+ or .NET Core process"**.
+2. A process picker appears listing several processes — pick the actual app, e.g. `MyProject.exe`, **not** the shell/terminal process you ran `dotnet run` from (e.g. `bash`, `pwsh`). Attaching to the shell will look like it worked, but breakpoints won't bind and you'll get "No symbols have been loaded for this document" — that's the sign you picked the wrong one.
+
+This works for any already-running .NET process, not just ones started via `dotnet run` — useful for attaching to something running in Docker, a separate terminal, or launched by another tool entirely.
+
+If your solution has more than one project, `dotnet run` on its own only works from inside that project's own directory — from anywhere else (e.g. the solution root), point it at the project explicitly:
+
+```sh
+dotnet run --project MyProject/MyProject.csproj
+```
+
 ## Adding a Web API project
 
 There are two ways to go about this, depending on whether you want to keep the console app or replace it.
