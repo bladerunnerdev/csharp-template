@@ -50,6 +50,21 @@ If you ran `dotnet run` in a plain terminal (or anywhere else outside VS Code's 
 
 This works for any already-running .NET process, not just ones started via `dotnet run` — useful for attaching to something running in Docker, a separate terminal, or launched by another tool entirely.
 
+If you find yourself doing this often for the same project, you can skip the Command Palette step by adding an attach configuration to `.vscode/launch.json` instead:
+
+```json
+"configurations": [
+    {
+        "name": "Attach to MyProject",
+        "type": "coreclr",
+        "request": "attach",
+        "processId": "${command:pickProcess}"
+    }
+]
+```
+
+With this in place, F5 (or Run and Debug → "Attach to MyProject") brings up the same filtered process picker directly — type part of the process name (e.g. the project name, or `dotnet`), pick the matching PID, and the debugger attaches. Runs started outside VS Code (a separate terminal, Docker, etc.) are untouched — their output keeps flowing wherever they were started, VS Code just attaches the debugger to the running process.
+
 If your solution has more than one project, `dotnet run` on its own only works from inside that project's own directory — from anywhere else (e.g. the solution root), point it at the project explicitly:
 
 ```sh
