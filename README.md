@@ -65,8 +65,10 @@ There are two ways to go about this, depending on whether you want to keep the c
 Adds a new project to the existing `CSharpTemplate.slnx` without touching what's already here.
 
 ```sh
+# pick one of the two:
 dotnet new webapi -n MyApi                # minimal API (no controllers)
 dotnet new webapi -controllers -n MyApi   # controller-based Web API
+
 dotnet sln add MyApi/MyApi.csproj
 ```
 
@@ -78,8 +80,11 @@ Removes the template's own console app, project, and solution files first, then 
 rm -r CSharpTemplate.slnx CSharpTemplate
 
 dotnet new sln --name MyApi
+
+# pick one of the two:
 dotnet new webapi -n MyApi                # minimal API (no controllers)
 dotnet new webapi -controllers -n MyApi   # controller-based Web API
+
 dotnet sln add MyApi/MyApi.csproj
 ```
 
