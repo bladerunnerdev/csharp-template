@@ -77,16 +77,18 @@ dotnet run --project MyProject/MyProject.csproj
 
 There are two ways to go about this, depending on whether you want to keep the console app or replace it.
 
+Name the project itself with an `.Api` suffix (e.g. `MyProject.Api`) rather than just `MyProject` — that leaves `MyProject` free as the solution/product name, so future projects sit alongside it as `MyProject.Domain`, `MyProject.Infrastructure`, etc. without a naming clash.
+
 ### Option A: keep the template project, add the API alongside it
 
 Adds a new project to the existing `CSharpTemplate.slnx` without touching what's already here.
 
 ```sh
 # pick one of the two:
-dotnet new webapi -n MyApi                # minimal API (no controllers)
-dotnet new webapi -controllers -n MyApi   # controller-based Web API
+dotnet new webapi -n MyProject.Api                # minimal API (no controllers)
+dotnet new webapi -controllers -n MyProject.Api   # controller-based Web API
 
-dotnet sln add MyApi/MyApi.csproj
+dotnet sln add MyProject.Api/MyProject.Api.csproj
 ```
 
 ### Option B: start from scratch
@@ -96,13 +98,13 @@ Removes the template's own console app, project, and solution files first, then 
 ```sh
 rm -r CSharpTemplate.slnx CSharpTemplate CSharpTemplate.Tests
 
-dotnet new sln --name MyApi
+dotnet new sln --name MyProject
 
 # pick one of the two:
-dotnet new webapi -n MyApi                # minimal API (no controllers)
-dotnet new webapi -controllers -n MyApi   # controller-based Web API
+dotnet new webapi -n MyProject.Api                # minimal API (no controllers)
+dotnet new webapi -controllers -n MyProject.Api   # controller-based Web API
 
-dotnet sln add MyApi/MyApi.csproj
+dotnet sln add MyProject.Api/MyProject.Api.csproj
 ```
 
 `dotnet sln add` looks for a single `.sln`/`.slnx` in the current directory when none is given — if you skip `dotnet new sln` after deleting `CSharpTemplate.slnx`, it'll fail with "no solution file found."
