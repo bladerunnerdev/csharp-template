@@ -29,6 +29,45 @@ A side-by-side of where to do common .NET dev tasks in each tool. The short vers
 | Solution-wide search | Ctrl+; (Go To All), Find in Files | Ctrl+P (Go To File), Ctrl+Shift+F (Find in Files) | `grep`/`rg` |
 | Extensions/plugins | Extensions and Updates dialog, Visual Studio Marketplace | Extensions view, VS Code Marketplace (`.vscode/extensions.json` in this template pins recommendations) | n/a |
 
+## Adding different project types
+
+`dotnet new` has a template for pretty much every project shape; Visual Studio's "New Project" dialog and VS Code's **.NET: New Project** command are both just UI pickers over the same template set (C# Dev Kit's list mirrors the CLI names 1:1). The main place they diverge is designer support for the older desktop UI frameworks.
+
+| Project type | CLI template | Visual Studio | VS Code (C# Dev Kit) | Typical use |
+|---|---|---|---|---|
+| Console app | `console` | "Console App" | .NET: New Project → Console App | entry point / CLI tools (this template's `CSharpTemplate` project) |
+| Class library | `classlib` | "Class Library" | .NET: New Project → Class Library | code with no entry point of its own — **this is what you want for Domain, Application, Infrastructure, Data, or any other internal layer** |
+| ASP.NET Core Web API, minimal | `webapi` | "ASP.NET Core Web API" (untick "Use controllers") | same, template prompts the same option | HTTP API entry point, minimal API style |
+| ASP.NET Core Web API, controllers | `webapi -controllers` | "ASP.NET Core Web API" (tick "Use controllers") | same | HTTP API entry point, MVC controller style |
+| ASP.NET Core MVC web app | `mvc` | "ASP.NET Core Web App (Model-View-Controller)" | same | server-rendered web app with controllers/views |
+| Razor Pages web app | `webapp` | "ASP.NET Core Web App" | same | server-rendered, page-based web app |
+| Blazor Web App | `blazor` | "Blazor Web App" (choose Server/WebAssembly/Auto render mode) | same | interactive web UI in C# instead of JS |
+| Worker Service | `worker` | "Worker Service" | same | long-running background service, no HTTP endpoint (queue processors, scheduled jobs) |
+| xUnit / NUnit / MSTest test project | `xunit` / `nunit` / `mstest` | "xUnit/NUnit/MSTest Test Project" | same | unit tests (this template uses `xunit` for `CSharpTemplate.Tests`) |
+| gRPC service | `grpc` | "gRPC Service" | same | RPC-style API entry point |
+| WPF app | `wpf` | "WPF Application", full XAML designer | template works, but no visual XAML designer — code/XAML only | Windows desktop UI |
+| Windows Forms app | `winforms` | "Windows Forms App", full drag-and-drop designer | template works, no visual designer | Windows desktop UI |
+| Azure Functions | needs Azure Functions Core Tools (`func`) or the `Azure.Functions.Cli` templates | "Azure Functions" (Azure workload installed) | Azure Functions extension provides its own project creation | serverless, event-triggered functions |
+
+### Which type for Domain / Infrastructure / Data / Application layers?
+
+All of those are **class libraries** (`dotnet new classlib`) — there's no separate "domain project" or "infrastructure project" template. The type name in `dotnet new` just describes what hosts/runs the code (console entry point, web host, test runner, or nothing); layering is a naming and dependency convention you apply on top of plain class libraries. A typical split, following the dependencies-point-inward rule of Clean/Onion architecture:
+
+```sh
+dotnet new classlib -n MyProject.Domain          # entities, value objects, domain logic — no dependencies on anything else
+dotnet new classlib -n MyProject.Application     # use cases/services, depends on Domain only
+dotnet new classlib -n MyProject.Infrastructure  # EF Core, external APIs, file/email/etc. — implements interfaces defined in Domain/Application
+dotnet new webapi -n MyProject.Api               # composition root: wires everything up, depends on all of the above
+
+dotnet sln add MyProject.Domain/MyProject.Domain.csproj MyProject.Application/MyProject.Application.csproj MyProject.Infrastructure/MyProject.Infrastructure.csproj MyProject.Api/MyProject.Api.csproj
+
+dotnet add MyProject.Application reference MyProject.Domain
+dotnet add MyProject.Infrastructure reference MyProject.Domain MyProject.Application
+dotnet add MyProject.Api reference MyProject.Application MyProject.Infrastructure
+```
+
+If you want a dedicated persistence project instead of folding EF Core/DbContext/migrations into `Infrastructure`, that's also just a `classlib` — commonly named `MyProject.Persistence` or `MyProject.Data`, referenced by `Infrastructure` or directly by `Api`, depending on how strictly you're separating concerns. There's no wrong template choice here since it's always `classlib` — the only real decision is how many of these libraries you want and how you name/reference them.
+
 ## Where they genuinely differ
 
 - **Visual Studio** bundles specialized designers and wizards that don't have a real CLI or VS Code equivalent — the WPF/WinForms XAML designer, the EF Core Power Tools reverse-engineering UI, and the Publish wizard's guided Azure resource creation. If you're doing heavy WPF/WinForms UI work or clicking through Azure resource setup, VS is genuinely more convenient.
