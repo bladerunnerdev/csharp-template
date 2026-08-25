@@ -5,6 +5,7 @@ Template with boilerplate for a C# project targeting .NET 10, with a dev contain
 ## What's included
 
 - `CSharpTemplate/CSharpTemplate.csproj` / `CSharpTemplate.slnx` — a console app project and solution
+- `CSharpTemplate.Tests/CSharpTemplate.Tests.csproj` — an xUnit test project referencing the console app, with examples of common xUnit features
 - `global.json` — pins the .NET SDK version so local, dev container, and CI builds stay in sync
 - `.editorconfig` — code style and formatting rules, respected by VS Code, Visual Studio, Rider, and `dotnet format`
 - `.devcontainer/devcontainer.json` — a ready-to-use dev container with the .NET SDK and recommended extensions preinstalled
@@ -23,6 +24,7 @@ Requires the [.NET SDK](https://dotnet.microsoft.com/download) version pinned in
 ```sh
 dotnet build   # build the solution
 dotnet run     # run the console app
+dotnet test    # run the unit tests
 ```
 
 ### If VS Code shows "No Solution"
@@ -92,7 +94,7 @@ dotnet sln add MyApi/MyApi.csproj
 Removes the template's own console app, project, and solution files first, then creates a fresh solution containing only the new API.
 
 ```sh
-rm -r CSharpTemplate.slnx CSharpTemplate
+rm -r CSharpTemplate.slnx CSharpTemplate CSharpTemplate.Tests
 
 dotnet new sln --name MyApi
 
@@ -107,9 +109,26 @@ dotnet sln add MyApi/MyApi.csproj
 
 Either way, if you're using C# Dev Kit, the same templates are available from the Command Palette via **".NET: New Project"**, which walks through picking a template, name, and location instead of using the CLI directly.
 
+## Unit testing
+
+`CSharpTemplate.Tests` is an [xUnit](https://xunit.net/) project referencing `CSharpTemplate`. `CalculatorTests.cs` tests the `Calculator` class (`Calculator.cs`) and doubles as a reference for common xUnit features: `[Fact]`/`[Theory]` with `[InlineData]`, `[MemberData]`, and `[ClassData]`; `Assert.Throws`; `[Trait]`; `Skip`; async tests; constructor/`IDisposable` setup-teardown; `IClassFixture<T>`; and `ITestOutputHelper`. Run it with:
+
+```sh
+dotnet test
+```
+
+To add another test project (e.g. for a new project added alongside this one), scaffold and wire it in the same way:
+
+```sh
+dotnet new xunit -n MyProject.Tests -o MyProject.Tests
+dotnet add MyProject.Tests/MyProject.Tests.csproj reference MyProject/MyProject.csproj
+dotnet sln add MyProject.Tests/MyProject.Tests.csproj
+```
+
 ## Using this as a starting point
 
 This repo is meant to be renamed once you start a real project. At minimum, update:
 
 - `CSharpTemplate/CSharpTemplate.csproj`, `CSharpTemplate.slnx`, and the `CSharpTemplate` folder itself — rename all three and update the `<Project Path>` reference inside the `.slnx`
+- `CSharpTemplate.Tests/CSharpTemplate.Tests.csproj` and the `CSharpTemplate.Tests` folder — rename both, update the `<Project Path>` in the `.slnx`, and update the project reference to point at the renamed console app project
 - This README
