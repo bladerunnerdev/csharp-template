@@ -16,7 +16,8 @@
         "ms-dotnettools.vscode-dotnet-runtime",
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
-        "anthropic.claude-code"
+        "anthropic.claude-code",
+        "humao.rest-client"
     ],
     "unwantedRecommendations": []
 }
