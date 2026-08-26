@@ -7,6 +7,7 @@ Template with boilerplate for a C# project targeting .NET 10, with a dev contain
 - `CSharpTemplate/CSharpTemplate.csproj` / `CSharpTemplate.slnx` — a console app project and solution
 - `CSharpTemplate.Tests/CSharpTemplate.Tests.csproj` — an xUnit test project referencing the console app, with examples of common xUnit features
 - `global.json` — pins the .NET SDK version so local, dev container, and CI builds stay in sync
+- `Directory.Build.props` — MSBuild properties shared by every project in the repo (currently just `GenerateDocumentationFile`), so new projects pick them up automatically instead of needing them copy-pasted into each `.csproj`
 - `.editorconfig` — code style and formatting rules, respected by VS Code, Visual Studio, Rider, and `dotnet format`
 - `.devcontainer/devcontainer.json` — a ready-to-use dev container with the .NET SDK and recommended extensions preinstalled
 - `.vscode/` — workspace settings, extension recommendations, a launch configuration shell, and a snippets file

@@ -1,4 +1,4 @@
-# Visual Studio vs. VS Code vs. CLI
+# .NET tooling notes: Visual Studio vs. VS Code vs. CLI
 
 A side-by-side of where to do common .NET dev tasks in each tool. The short version: Visual Studio wraps most of this in dialogs and wizards; VS Code (with C# Dev Kit) exposes the same functionality through the Command Palette and its UI panels; and the `dotnet` CLI (plus `git`) is what both of them call under the hood for almost everything project/build/test related. If you're comfortable in a terminal, you can do essentially all of this without either editor.
 
@@ -19,6 +19,7 @@ A side-by-side of where to do common .NET dev tasks in each tool. The short vers
 | Code formatting | Edit → Advanced → Format Document, format-on-save setting | Format Document (Shift+Alt+F), format-on-save setting | `dotnet format` |
 | Static analysis / code cleanup | Built-in Roslyn analyzers, Error List, "Run Code Cleanup" profiles | Same Roslyn analyzers via the C# extension, Problems panel | `dotnet format analyzers`, or `dotnet build` (analyzers configured as build errors/warnings) |
 | Refactoring (rename, extract method, etc.) | Right-click → Quick Actions and Refactorings, Ctrl+. | Ctrl+. (lightbulb) — same Roslyn refactoring engine | n/a — editor-only |
+| Generate an XML doc comment skeleton (`///`) | Built-in — `///` above a member always auto-expands to the full `<summary>`/`<param>`/`<returns>` skeleton | Off by default — needs `"editor.formatOnType": true` in `.vscode/settings.json` (set in this template) | n/a — editor-only; `dotnet build` just consumes whatever comments already exist, see below |
 | Go to definition / Find references | F12 / Shift+F12, Solution Explorer, Class View | F12 / Shift+F12, Outline view | n/a — editor-only (`grep`/`rg` as a poor substitute) |
 | Git operations | Git Changes window, built-in diff/merge UI | Source Control view, built-in diff, GitLens extension for blame/history | `git` directly (`status`, `add`, `commit`, `push`, etc.) |
 | Manage `launchSettings.json` / launch profiles | UI dropdown next to the Run button | Edit `Properties/launchSettings.json` directly, or `.vscode/launch.json` for editor-side config | n/a — it's a JSON file either way; `dotnet run --launch-profile <name>` to pick one |
@@ -67,6 +68,16 @@ dotnet add MyProject.Api reference MyProject.Application MyProject.Infrastructur
 ```
 
 If you want a dedicated persistence project instead of folding EF Core/DbContext/migrations into `Infrastructure`, that's also just a `classlib` — commonly named `MyProject.Persistence` or `MyProject.Data`, referenced by `Infrastructure` or directly by `Api`, depending on how strictly you're separating concerns. There's no wrong template choice here since it's always `classlib` — the only real decision is how many of these libraries you want and how you name/reference them.
+
+## XML documentation comments (the JSDoc equivalent)
+
+C#'s equivalent of JSDoc is triple-slash (`///`) XML documentation comments — `<summary>`, `<param>`, `<returns>`, `<exception>`, etc. above a type or member. [Calculator.cs](CSharpTemplate/Calculator.cs) is fully documented this way, as a reference.
+
+This is a native compiler feature, not a package — [Directory.Build.props](Directory.Build.props) at the repo root sets `<GenerateDocumentationFile>true</GenerateDocumentationFile>`, so every project picks it up automatically (a `.sln`/`.slnx` can't do this itself — it's just a list of project references, not part of the MSBuild import chain; `Directory.Build.props` is what actually flows a shared property down into every project's build without repeating it per `.csproj`). The compiler then emits an XML file alongside each DLL that VS Code, Visual Studio, and Rider all read for hover/IntelliSense docs.
+
+You don't need the repo-wide file for this — the same `<GenerateDocumentationFile>true</GenerateDocumentationFile>` works dropped directly into a single project's own `<PropertyGroup>` instead, scoped to just that project. `Directory.Build.props` is only worth it once you want the setting applied consistently everywhere without repeating it per `.csproj` (and risking a new project missing it).
+
+It also means the compiler warns (`CS1591`) about any public member that's missing a comment — intentional, as a nudge to document your public API. [CalculatorTests.cs](CSharpTemplate.Tests/CalculatorTests.cs) deliberately leaves these warnings in place as a live example of what they look like on undocumented test code; add `<NoWarn>$(NoWarn);CS1591</NoWarn>` to a project's `.csproj` if you'd rather silence them there (e.g. for test projects, where the public members aren't really a documented API surface).
 
 ## Where they genuinely differ
 
