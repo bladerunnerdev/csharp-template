@@ -22,9 +22,10 @@ Open the folder in VS Code and choose **"Reopen in Container"** when prompted (r
 Requires the [.NET SDK](https://dotnet.microsoft.com/download) version pinned in `global.json`.
 
 ```sh
-dotnet build   # build the solution
-dotnet run     # run the console app
-dotnet test    # run the unit tests
+dotnet build     # build the solution
+dotnet run       # run the console app
+dotnet watch run # run the console app with hot reload, restarting on file changes
+dotnet test      # run the unit tests
 ```
 
 ### If VS Code shows "No Solution"
@@ -72,6 +73,23 @@ If your solution has more than one project, `dotnet run` on its own only works f
 ```sh
 dotnet run --project MyProject/MyProject.csproj
 ```
+
+## SDK-style vs. old-style project files
+
+This template's `.csproj` files (e.g. [CSharpTemplate.csproj](CSharpTemplate/CSharpTemplate.csproj)) are **SDK-style** — the modern format, identified by `<Project Sdk="Microsoft.NET.Sdk">` at the top. SDK-style projects use implicit globbing: every `.cs` file under the project folder is compiled automatically, so adding, deleting, renaming, or moving a file just works — nothing to update in the `.csproj`.
+
+Older, **non-SDK-style** projects (classic .NET Framework `.csproj`s, mainly) work differently: every source file has to be listed explicitly, e.g. `<Compile Include="Services\MyService.cs" />`. A file that exists on disk but isn't in that list won't compile — and yes, in Visual Studio it won't even show up in Solution Explorer; "Show All Files" reveals it, and "Include In Project" adds it. Renaming, moving, or deleting a file has to be mirrored in the `.csproj`, which Visual Studio normally does for you automatically.
+
+### Doing this automatically in VS Code
+
+As of May 2026, C# Dev Kit no longer has a dedicated, collapsible "Solution Explorer" panel — it was merged into VS Code's native Explorer, on the reasoning that the file system, not the project file, should be the source of truth. If something (a chat, a tutorial) told you to look for a separate Solution Explorer view and you can't find it, that's outdated rather than wrong — it did exist, up until that change. What's there today:
+
+- For **SDK-style** projects like this one, the regular Explorer is solution-aware and file operations (create/rename/move/delete) just work, since — per above — nothing needs to be added to the `.csproj` in the first place.
+- **".NET: New File..."** in the Command Palette scaffolds a new file from a template into a chosen project. It's created at the project root; move it afterwards if you wanted it in a subfolder.
+- A read-only **"C# Project Details"** view in the Explorer sidebar shows a project's dependencies, packages, and target framework.
+- For genuine **old-style** projects, C# Dev Kit's tooling is limited, since it targets SDK-style projects primarily — expect to hand-edit `<Compile Include>` entries yourself, or use Visual Studio, which still manages them for you via its own Solution Explorer.
+
+See the [C# project management docs](https://code.visualstudio.com/docs/csharp/project-management) for more.
 
 ## Adding a Web API project
 
