@@ -26,6 +26,9 @@ dotnet build     # build the solution
 dotnet run       # run the console app
 dotnet watch run # run the console app with hot reload, restarting on file changes
 dotnet test      # run the unit tests
+
+dotnet run --project CSharpTemplate/CSharpTemplate.csproj       # run from outside the project's own directory
+dotnet watch run --project CSharpTemplate/CSharpTemplate.csproj # same, with hot reload
 ```
 
 ### If VS Code shows "No Solution"
