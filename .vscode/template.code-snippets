@@ -25,5 +25,16 @@
             "}"
         ],
         "description": "Class declaration with the public modifier"
+    },
+    "Method": {
+        "scope": "csharp",
+        "prefix": "method",
+        "body": [
+            "public void ${1:MethodName}()",
+            "{",
+            "\t$0",
+            "}"
+        ],
+        "description": "Method declaration with the public modifier"
     }
 }
