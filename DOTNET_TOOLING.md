@@ -79,6 +79,67 @@ You don't need the repo-wide file for this — the same `<GenerateDocumentationF
 
 It also means the compiler warns (`CS1591`) about any public member that's missing a comment — intentional, as a nudge to document your public API. [CalculatorTests.cs](CSharpTemplate.Tests/CalculatorTests.cs) deliberately leaves these warnings in place as a live example of what they look like on undocumented test code; add `<NoWarn>$(NoWarn);CS1591</NoWarn>` to a project's `.csproj` if you'd rather silence them there (e.g. for test projects, where the public members aren't really a documented API surface).
 
+## Scaffolding with `dotnet-aspnet-codegenerator`
+
+`aspnet-codegenerator` is the CLI-only equivalent of Visual Studio's right-click → Add → Controller/View wizard. It's a .NET tool, not part of the base SDK, so it has to be installed separately, and it needs a couple of design-time packages on the *target* project before it can generate anything into it.
+
+### Install
+
+Pick one:
+
+```sh
+# global tool — available in every project on this machine
+dotnet tool install -g dotnet-aspnet-codegenerator
+dotnet tool update -g dotnet-aspnet-codegenerator   # later, to upgrade
+
+# local tool — pinned per-repo via a tool manifest (checked into source control, like this template's global.json pins the SDK)
+dotnet new tool-manifest                             # only if the repo doesn't already have .config/dotnet-tools.json
+dotnet tool install dotnet-aspnet-codegenerator
+dotnet tool restore                                  # what teammates/CI run to get the same version
+```
+
+With a local tool, either prefix commands with `dotnet tool run` or just call `dotnet aspnet-codegenerator ...` directly — the local manifest is picked up automatically once restored.
+
+Then, in the **target project** (the one you're scaffolding into, e.g. a `webapi`/`mvc`/`webapp` project — not this template's console app), add the design-time package it needs to reflect over your code:
+
+```sh
+dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design
+```
+
+If you're scaffolding anything EF Core-backed (a controller/page bound to a `DbContext`), also add:
+
+```sh
+dotnet add package Microsoft.EntityFrameworkCore.Design
+```
+
+Run generation commands from inside the target project's directory (where its `.csproj` lives), or pass `-p <path-to-project>`. The project must build successfully first — the generator does a design-time build to discover your models/`DbContext`.
+
+### Generators and common commands
+
+| Generator | Produces | Example |
+|---|---|---|
+| `controller` | MVC or Web API controller, optionally with CRUD actions wired to a `DbContext` | `dotnet aspnet-codegenerator controller -name ProductsController -async -api -m Product -dc AppDbContext -outDir Controllers` |
+| `controller` (MVC + views) | Controller with Create/Edit/Delete/Details/Index views | `dotnet aspnet-codegenerator controller -name ProductsController -m Product -dc AppDbContext -udl -outDir Controllers` |
+| `view` | A single Razor view for an existing action | `dotnet aspnet-codegenerator view Edit Edit -m Product -dc AppDbContext -outDir Views/Products` |
+| `razorpage` | Razor Pages CRUD page set | `dotnet aspnet-codegenerator razorpage Product CRUD -m Product -dc AppDbContext -udl -outDir Pages/Products` |
+| `identity` | Scaffolds ASP.NET Core Identity's default UI (login/register/etc.) into your project so you can customize it | `dotnet aspnet-codegenerator identity -dc AppDbContext` |
+| `area` | Empty MVC area folder structure (`Areas/<Name>/{Controllers,Views,Models}`) | `dotnet aspnet-codegenerator area Admin` |
+
+Useful flags across the controller/view/razorpage generators:
+
+- `-m <Model>` — the model class to scaffold CRUD against
+- `-dc <DbContext>` — the `DbContext` class to query/save through (generator will offer to create one if it can't find it)
+- `-api` — Web API controller (JSON actions, no views) instead of MVC
+- `-actions` — include CRUD action methods (for an MVC controller *without* the `-api` flag)
+- `-async` / `-a` — generate `async`/`await` action methods
+- `-udl` — use the app's default `_Layout.cshtml` for generated views
+- `-outDir <path>` — output folder, relative to the project
+- `-f` — force overwrite of existing files
+
+Run `dotnet aspnet-codegenerator <generator> -h` for the full flag list per generator — they differ slightly (e.g. `razorpage` takes a template name like `CRUD`/`Create`/`Delete`/`Details`/`Edit`/`List`/`Empty` as its second positional argument, the same set `view` accepts as its first).
+
+This is scaffolding, not migrations — for EF Core schema changes (`dotnet ef migrations add`), see the "Scaffolding" row in the table at the top of this doc and install `dotnet-ef` separately the same way.
+
 ## Where they genuinely differ
 
 - **Visual Studio** bundles specialized designers and wizards that don't have a real CLI or VS Code equivalent — the WPF/WinForms XAML designer, the EF Core Power Tools reverse-engineering UI, and the Publish wizard's guided Azure resource creation. If you're doing heavy WPF/WinForms UI work or clicking through Azure resource setup, VS is genuinely more convenient.
