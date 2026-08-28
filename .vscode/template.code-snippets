@@ -15,4 +15,15 @@
     // 	],
     // 	"description": "Log output to console"
     // }
+    "Public class": {
+        "scope": "csharp",
+        "prefix": "publicclass",
+        "body": [
+            "public class ${1:$TM_FILENAME_BASE}",
+            "{",
+            "\t$0",
+            "}"
+        ],
+        "description": "Class declaration with the public modifier"
+    }
 }
