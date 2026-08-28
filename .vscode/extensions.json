@@ -17,7 +17,8 @@
         "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
         "anthropic.claude-code",
-        "humao.rest-client"
+        "humao.rest-client",
+        "yzhang.markdown-all-in-one"
     ],
     "unwantedRecommendations": []
 }

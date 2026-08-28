@@ -10,7 +10,6 @@
                 "GitHub.copilot-chat",
                 "eamodio.gitlens",
                 "oderwat.indent-rainbow",
-                "Gruntfuggly.todo-tree",
                 "adamhartford.vscode-base64",
                 "redhat.vscode-yaml",
                 "vscode-icons-team.vscode-icons",
@@ -19,7 +18,8 @@
                 "ms-dotnettools.csharp",
                 "ms-dotnettools.csdevkit",
                 "anthropic.claude-code",
-                "humao.rest-client"
+                "humao.rest-client",
+                "yzhang.markdown-all-in-one"
             ]
         }
     }
