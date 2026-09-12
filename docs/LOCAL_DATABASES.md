@@ -166,11 +166,23 @@ winget install Microsoft.SQLServer.2025.Express     # lighter, 10 GB database ca
 Both launch Microsoft's installer UI — pick **Basic** unless you know you need otherwise. Add a GUI client:
 
 ```powershell
-winget install Microsoft.SQLServerManagementStudio.21    # SSMS
-winget install Microsoft.Azure.DataStudio                # cross-platform alternative
+winget install Microsoft.SQLServerManagementStudio.22    # SSMS 22 — current release
+code --install-extension ms-mssql.mssql                  # or stay in VS Code
 ```
 
-Substitute `2022` for `2025` in any of the IDs above for the previous major version.
+Watch the SSMS package IDs — they don't work the way you'd expect:
+
+| Package ID                                | Is                | Version |
+| ----------------------------------------- | ----------------- | ------- |
+| `Microsoft.SQLServerManagementStudio`      | SSMS **20**       | 20.2.1  |
+| `Microsoft.SQLServerManagementStudio.21`   | SSMS 21           | 21.6.17 |
+| `Microsoft.SQLServerManagementStudio.22`   | SSMS 22 — current | 22.10.0 |
+
+The unversioned ID is *not* an alias for the newest release; it's pinned to SSMS 20. Always install the explicitly numbered package. There are also `.21.Preview` and `.22.Preview` packages, both older than their stable counterparts — ignore them.
+
+Azure Data Studio is the obvious-looking cross-platform alternative, but Microsoft has retired it and its winget package has been frozen at 1.52.0 since mid-2025. The VS Code **SQL Server (mssql)** extension above is where that functionality went, and it suits this template better anyway.
+
+Substitute `2022` for `2025` in the SQL Server IDs above for the previous major version.
 
 | Instance                | Service name        | Connect with         |
 | ----------------------- | ------------------- | -------------------- |
