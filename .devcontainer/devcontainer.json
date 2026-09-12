@@ -19,7 +19,8 @@
                 "ms-dotnettools.csdevkit",
                 "anthropic.claude-code",
                 "humao.rest-client",
-                "yzhang.markdown-all-in-one"
+                "yzhang.markdown-all-in-one",
+                "ms-mssql.mssql"
             ]
         }
     }
