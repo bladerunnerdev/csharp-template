@@ -297,8 +297,12 @@ dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 dotnet add package Microsoft.EntityFrameworkCore.Design
 # ...write your entities and DbContext...
 dotnet ef migrations add InitialCreate
-dotnet ef database update
+dotnet ef database update        # creates the database, then applies the migration
 ```
+
+**You don't create the database yourself.** `dotnet ef database update` connects to the *server* named in your connection string and issues the `CREATE DATABASE` for you if the database doesn't exist yet — no `CREATE DATABASE` in SSMS or sqlcmd first, no empty database to prepare. It then applies every pending migration and records them in `__EFMigrationsHistory`.
+
+What must already exist is the **server**: a running SQL Server instance or container ([LOCAL_DATABASES.md](LOCAL_DATABASES.md#sql-server)) reachable at the connection string's host and port, with a login that has permission to create databases (`sa` and `dbcreator` both qualify). SQLite is the easy case — the "server" is the file system, so `database update` just writes the `.db` file. If the database already exists, it's left alone and only the pending migrations run.
 
 **The everyday change loop:** edit an entity → `dotnet ef migrations add DescribeTheChange` → **read the generated migration** → `dotnet ef database update`. That middle step is not optional busywork: EF's diff is a guess about intent, and renames in particular usually come out as drop-column + add-column, which silently destroys data. Change it to `migrationBuilder.RenameColumn(...)` by hand when that's what you meant.
 
@@ -365,6 +369,14 @@ The startup-migrate approach deserves a warning. It looks tidy and it's what mos
 - **`.InMemory` is not a database.** It ignores relational constraints, unique indexes, and transactions, so tests pass against it that would fail in production. Microsoft's own guidance is to use SQLite (file or `:memory:`) for tests that need realistic behaviour.
 - **A design-time build is still a build.** Analyzer errors, nullable warnings escalated to errors, or a broken unrelated file in the same project will stop `dotnet ef` with an error that looks nothing like a compiler error. If a command fails confusingly, run `dotnet build` first.
 - **The connection string EF uses at design time isn't necessarily your app's.** `dotnet ef dbcontext info` settles it in one command — check there before assuming a migration went to the wrong database by magic.
+- **Windows 11 Smart App Control can block `dotnet ef` outright.** SAC only allows apps it considers signed and reputable, and a .NET tool installed from NuGet doesn't qualify — so commands die before EF runs, with a generic "blocked" dialog or an unexplained non-zero exit rather than an EF error. Check under **Windows Security → App & browser control → Smart App Control**, or read the state directly:
+
+  ```powershell
+  (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy').VerifiedAndReputablePolicyState
+  # 0 = off, 1 = on (enforced), 2 = evaluation mode
+  ```
+
+  **Turning SAC off is a one-way door** — Windows does not let you switch it back on afterwards; that requires reinstalling Windows. It's only ever enabled on clean installs, and in evaluation mode (`2`) it often disables itself once it decides it's getting in your way. Before disabling it, consider whether the dev container ([.devcontainer/](../.devcontainer/)) or WSL2 is a better home for this work, since neither is subject to SAC. The same block can hit other unsigned dev tools — a migration `efbundle.exe`, or a portable `sqlite3.exe` from a downloaded zip.
 
 ## Where EF Core tooling differs across editors
 

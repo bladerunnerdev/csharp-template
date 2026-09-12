@@ -150,6 +150,7 @@ For integration tests, SQLite in-memory is the realistic alternative to EF's `In
 - **Limited `ALTER TABLE`.** No dropping constraints, no changing column types. EF migrations work around this by rebuilding the table — which is why SQLite migrations look far more dramatic than the same change on SQL Server.
 - **Concurrency is coarse.** One writer at a time, database-wide. `PRAGMA journal_mode=WAL;` (persistent, set once) lets readers continue during a write and is worth enabling for anything beyond single-user.
 - **Idempotent migration scripts aren't supported** — see [EF_CORE.md](EF_CORE.md#gotchas-worth-knowing).
+- **Windows 11 Smart App Control may block `sqlite3.exe`**, since the winget package is an unsigned portable zip. Same symptom and same caveats as with `dotnet ef` — see [EF_CORE.md](EF_CORE.md#gotchas-worth-knowing), and note that disabling SAC can't be undone without reinstalling Windows.
 
 ## SQL Server
 
@@ -295,6 +296,8 @@ winget install Microsoft.Sqlcmd
 | `-Q`        | Run a query and exit; `-i` runs a script file      |
 | `-C`        | Trust the self-signed certificate                  |
 | `-s` / `-W` | Column separator / trim whitespace — for CSV-ish output |
+
+If your app uses EF Core, you don't need the `CREATE DATABASE` below — `dotnet ef database update` creates the database itself, as long as the server is running. See [EF_CORE.md](EF_CORE.md#common-workflows).
 
 ```sh
 # create a database
