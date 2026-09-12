@@ -94,7 +94,7 @@ Visual Studio's right-click a folder → Add → New Item (Ctrl+Shift+A) opens a
 
 ### Plain C# types (class, interface, enum, struct, record) — no CLI equivalent exists
 
-Checked against this repo's pinned SDK (`dotnet new list`): the base .NET SDK ships **no** item template for a bare `class`/`interface`/`enum`/`struct`/`record`. Only project-level templates (`console`, `classlib`, ...) and a handful of specific web/test item templates (below) are built in — nothing generic for "just a type in a file." This isn't a gap so much as a non-problem: this template's projects are SDK-style, which glob every `.cs` file under the project folder automatically (see [SDK-style vs. old-style project files](README.md#sdk-style-vs-old-style-project-files) in the README) — a class file needs no registration anywhere, so there's nothing for a template to generate beyond the text itself. The honest CLI "equivalent" is creating the file yourself and typing the code:
+Checked against this repo's pinned SDK (`dotnet new list`): the base .NET SDK ships **no** item template for a bare `class`/`interface`/`enum`/`struct`/`record`. Only project-level templates (`console`, `classlib`, ...) and a handful of specific web/test item templates (below) are built in — nothing generic for "just a type in a file." This isn't a gap so much as a non-problem: this template's projects are SDK-style, which glob every `.cs` file under the project folder automatically (see [SDK-style vs. old-style project files](../README.md#sdk-style-vs-old-style-project-files) in the README) — a class file needs no registration anywhere, so there's nothing for a template to generate beyond the text itself. The honest CLI "equivalent" is creating the file yourself and typing the code:
 
 ```sh
 # run from wherever the file should live, e.g. inside the project folder
@@ -107,7 +107,7 @@ touch Services/OrderService.cs      # bash, or this template's dev container
 VS Code does have a real equivalent, via C# Dev Kit: Command Palette → **.NET: New File...** draws on the same underlying item-template catalog Visual Studio's Add New Item uses (Class, Interface, Enum, Record, Struct, plus the web/Razor items below). Two differences from Visual Studio worth knowing before you rely on it:
 
 - It's Command Palette (or VS Code's own **File: New File...**) driven, not a folder right-click — in this template's pinned C# Dev Kit version, the command isn't wired into the Explorer's right-click menu, so right-clicking a folder won't offer it.
-- The generated file always lands at the target **project's root**, regardless of which folder had focus — move it afterwards if you wanted it in a subfolder (already called out in the README's [Doing this automatically in VS Code](README.md#doing-this-automatically-in-vs-code) section, for the same underlying command).
+- The generated file always lands at the target **project's root**, regardless of which folder had focus — move it afterwards if you wanted it in a subfolder (already called out in the README's [Doing this automatically in VS Code](../README.md#doing-this-automatically-in-vs-code) section, for the same underlying command).
 
 ### Item types `dotnet new` does support
 
@@ -144,7 +144,7 @@ Visual Studio's Add New Item also covers non-code files — `.gitignore`, `.edit
 | `Directory.Build.targets`                               | `dotnet new buildtargets`  |
 | `Directory.Packages.props` (central package management) | `dotnet new packagesprops` |
 
-Run `dotnet new list` yourself for the current, full catalog — the SDK adds and retires templates across versions, so both this table and the [project-type table](#adding-different-project-types) above reflect what ships with this repo's pinned SDK ([global.json](global.json)), not necessarily every SDK version.
+Run `dotnet new list` yourself for the current, full catalog — the SDK adds and retires templates across versions, so both this table and the [project-type table](#adding-different-project-types) above reflect what ships with this repo's pinned SDK ([global.json](../global.json)), not necessarily every SDK version.
 
 ## Overriding built-in code snippets (`class`, `ctor`, etc.)
 
@@ -158,7 +158,7 @@ So the actual fix only needs to target `class`/`interface`/`struct`/`enum`/`name
 
 ### Option A: add your own snippet with the same prefix
 
-This template already ships an empty shell for this at [.vscode/template.code-snippets](.vscode/template.code-snippets) (mentioned in the README's "What's included"), and now includes exactly this: a `Public class` entry with `prefix: publicclass`:
+This template already ships an empty shell for this at [.vscode/template.code-snippets](../.vscode/template.code-snippets) (mentioned in the README's "What's included"), and now includes exactly this: a `Public class` entry with `prefix: publicclass`:
 
 ```json
 "Public class": {
@@ -175,7 +175,7 @@ It's deliberately named `publicclass` rather than reusing the built-in `class` p
 
 ### Option B (more durable): turn on the accessibility-modifier analyzer
 
-[.editorconfig](.editorconfig) already states the *preference* for this, at line 59:
+[.editorconfig](../.editorconfig) already states the *preference* for this, at line 59:
 
 ```ini
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent
@@ -187,13 +187,13 @@ Visual Studio has its own, separate snippet system — Tools → Code Snippets M
 
 ## XML documentation comments (the JSDoc equivalent)
 
-C#'s equivalent of JSDoc is triple-slash (`///`) XML documentation comments — `<summary>`, `<param>`, `<returns>`, `<exception>`, etc. above a type or member. [Calculator.cs](CSharpTemplate/Calculator.cs) is fully documented this way, as a reference.
+C#'s equivalent of JSDoc is triple-slash (`///`) XML documentation comments — `<summary>`, `<param>`, `<returns>`, `<exception>`, etc. above a type or member. [Calculator.cs](../CSharpTemplate/Calculator.cs) is fully documented this way, as a reference.
 
-This is a native compiler feature, not a package — [Directory.Build.props](Directory.Build.props) at the repo root sets `<GenerateDocumentationFile>true</GenerateDocumentationFile>`, so every project picks it up automatically (a `.sln`/`.slnx` can't do this itself — it's just a list of project references, not part of the MSBuild import chain; `Directory.Build.props` is what actually flows a shared property down into every project's build without repeating it per `.csproj`). The compiler then emits an XML file alongside each DLL that VS Code, Visual Studio, and Rider all read for hover/IntelliSense docs.
+This is a native compiler feature, not a package — [Directory.Build.props](../Directory.Build.props) at the repo root sets `<GenerateDocumentationFile>true</GenerateDocumentationFile>`, so every project picks it up automatically (a `.sln`/`.slnx` can't do this itself — it's just a list of project references, not part of the MSBuild import chain; `Directory.Build.props` is what actually flows a shared property down into every project's build without repeating it per `.csproj`). The compiler then emits an XML file alongside each DLL that VS Code, Visual Studio, and Rider all read for hover/IntelliSense docs.
 
 You don't need the repo-wide file for this — the same `<GenerateDocumentationFile>true</GenerateDocumentationFile>` works dropped directly into a single project's own `<PropertyGroup>` instead, scoped to just that project. `Directory.Build.props` is only worth it once you want the setting applied consistently everywhere without repeating it per `.csproj` (and risking a new project missing it).
 
-It also means the compiler warns (`CS1591`) about any public member that's missing a comment — intentional, as a nudge to document your public API. [CalculatorTests.cs](CSharpTemplate.Tests/CalculatorTests.cs) deliberately leaves these warnings in place as a live example of what they look like on undocumented test code; add `<NoWarn>$(NoWarn);CS1591</NoWarn>` inside a `<PropertyGroup>` in a project's `.csproj` if you'd rather silence them there (e.g. for test projects, where the public members aren't really a documented API surface). It can go in the same `<PropertyGroup>` in [Directory.Build.props](Directory.Build.props) too, for the same reason `GenerateDocumentationFile` can (a `.sln`/`.slnx` still can't hold it — same MSBuild-import-chain limitation as above) — but doing so silences CS1591 for every project in the repo, including the intentional example in `CalculatorTests.cs`.
+It also means the compiler warns (`CS1591`) about any public member that's missing a comment — intentional, as a nudge to document your public API. [CalculatorTests.cs](../CSharpTemplate.Tests/CalculatorTests.cs) deliberately leaves these warnings in place as a live example of what they look like on undocumented test code; add `<NoWarn>$(NoWarn);CS1591</NoWarn>` inside a `<PropertyGroup>` in a project's `.csproj` if you'd rather silence them there (e.g. for test projects, where the public members aren't really a documented API surface). It can go in the same `<PropertyGroup>` in [Directory.Build.props](../Directory.Build.props) too, for the same reason `GenerateDocumentationFile` can (a `.sln`/`.slnx` still can't hold it — same MSBuild-import-chain limitation as above) — but doing so silences CS1591 for every project in the repo, including the intentional example in `CalculatorTests.cs`.
 
 ## Scaffolding with `dotnet-aspnet-codegenerator`
 
