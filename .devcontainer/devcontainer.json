@@ -20,7 +20,9 @@
                 "anthropic.claude-code",
                 "humao.rest-client",
                 "yzhang.markdown-all-in-one",
-                "ms-mssql.mssql"
+                "ms-mssql.mssql",
+                "docker.docker",
+                "ms-azuretools.vscode-containers"
             ]
         }
     }
