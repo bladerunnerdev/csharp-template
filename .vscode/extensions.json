@@ -21,7 +21,8 @@
         "yzhang.markdown-all-in-one",
         "ms-mssql.mssql",
         "docker.docker",
-        "ms-azuretools.vscode-containers"
+        "ms-azuretools.vscode-containers",
+        "ms-ossdata.vscode-pgsql"
     ],
     "unwantedRecommendations": []
 }
